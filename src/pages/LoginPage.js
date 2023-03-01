@@ -2,7 +2,7 @@ import React from "react";
 
 const LoginPage = () => {
   return (
-    <div>
+    <div className="loginPage bottom100px">
       <div className="register-page">
         <input type="text" placeholder="username" />
         <input type="password" placeholder="password" />

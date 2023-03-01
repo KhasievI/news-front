@@ -1,16 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import iconLogin from "../images/iconLogin.png";
+
 
 const Header = () => {
   return (
-    <header>
-      <div className="links">
-        <Link to="/">home</Link>    
-        <Link to="/login">login</Link>
-        <Link to="/register">register</Link>
-      </div>
+    <header className="header">
+      <div></div>
+      <Link to="/"><div className="newsLogo Link">FAKE NEWS</div></Link>
+      <Link ><img className="iconLogin" src={iconLogin} alt="iconLogin" /></Link>
     </header>
   );
 };
 
 export default Header;
+
+//  <div className="links">
+//   <Link to="/login">login</Link>
+//   <Link to="/register">register</Link>
+// </div>

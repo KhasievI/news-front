@@ -9,14 +9,16 @@ const SideBar = () => {
 
   useEffect(() => {
     dispatch(fetchCategories());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <div>
+    <div className="sideBar">
+      <Link to={`/`}>все</Link>
       {categories.map((category) => {
         return (
           <div>
             <Link to={`/category/${category._id}`}>
-              {category.nameCategory}
+              {category.nameCategory.toLowerCase()}
             </Link>
           </div>
         );
