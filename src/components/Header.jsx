@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <header className="header">
       <div></div>
-      <Link to="/"><div className="newsLogo Link">FAKE NEWS</div></Link>
+      <Link to="/"><div className="newsLogo Link"><strike>FAKE</strike>NEWS</div></Link>
       <Link ><img className="iconLogin" src={iconLogin} alt="iconLogin" /></Link>
     </header>
   );
