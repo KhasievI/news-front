@@ -1,34 +1,46 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import { fetchComments } from "../features/commentsSlice";
 import { fetchNews } from "../features/newsSlice";
 import SideBar from "./SideBar";
 
 const News = () => {
   const { newsId } = useParams(); // получаем id из роута
-  const news = useSelector((state) =>
-    state.newsReducer.news.filter((oneNews) => {
-      if (!newsId) return true;
-      return oneNews._id === newsId;
+  useEffect(() => {
+    dispatch(fetchComments());
+  }, []);
+  const comments = useSelector((state) =>
+    state.commentsReducer.comments.filter((comm) => {
+      return comm.news === newsId;
     })
+  );
+  console.log(comments);
+  const news = useSelector((state) =>
+    state.newsReducer.news.find((news) => news._id === newsId)
   );
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchNews());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  console.log("NEWS", news);
-  //вывод одной новости в новом окне при нажатии на нее
+  //вывод одной новости в новом окне при нажатии на нее'
+
+  if (!news) {
+    return "loading...  ";
+  }
+
   return (
     <div className="oneNews bottom100px">
       <SideBar />
-      <div className="titleNewsPage">{news[0].title}</div>
+      <div className="titleNewsPage">{news.title}</div>
       <img
         className="imgNewsPage"
-        src={`http://localhost:4000${news[0].img}`}
-        alt={news[0].title}
+        src={`http://localhost:4000${news.img}`}
+        alt={news.title}
       />
-      <div className="textNewsPage">{news[0].text}</div>
+      <div className="textNewsPage">{news.text}</div>
+      <div className="comments"></div>
       <Link to="/">
         <button>назад к новостям</button>
       </Link>
