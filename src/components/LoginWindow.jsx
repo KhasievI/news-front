@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { authSignIn } from "../features/applicationSlice";
 
 const LoginWindow = (props) => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-
-
+  const message = useSelector((state) => state.applicationReducer.logMessage);
   const handleSetText = (text) => {
     setLogin(text);
   };
@@ -17,29 +16,36 @@ const LoginWindow = (props) => {
   const hahndleSignUp = (e) => {
     e.preventDefault();
     dispatch(authSignIn({ login, password }));
-    setLogin('')
-    setPassword('')
-  }
+    setLogin("");
+    setPassword("");
+  };
+ 
 
   return (
-    <form onSubmit={hahndleSignUp} className="loginPage">
+    <form onSubmit={hahndleSignUp} className="registerForm">
+      <h4>Вход</h4>
       <input
+        className="modalInput"
         value={login}
         onChange={(e) => handleSetText(e.target.value)}
         type="text"
         placeholder="username"
       />
       <input
+        className="modalInput"
         value={password}
         onChange={(e) => handleSetPassword(e.target.value)}
         type="password"
         placeholder="password"
       />
-      <button>Войти</button>
+      <button className="signBtn">Войти</button>
+      {message && <div className="messageError">{message}</div>}
       <button className="btnRegister" onClick={() => props.setLog(true)}>
         Зарегистрироваться
       </button>
-      <div>После регистрации вы получите доступ ко всем возможностям нашего сайта</div>
+      <div className="info">
+        После авторизации вы получите доступ ко всем возможностям нашего сайта
+      </div>
     </form>
   );
 };

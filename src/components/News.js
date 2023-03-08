@@ -1,33 +1,22 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-import { fetchComments } from "../features/commentsSlice";
 import { fetchNews } from "../features/newsSlice";
+import Comments from "./comments/Comments";
 import SideBar from "./SideBar";
 
 const News = () => {
-  const { newsId } = useParams(); // получаем id из роута
-  useEffect(() => {
-    dispatch(fetchComments());
-  }, []);
-  const comments = useSelector((state) =>
-    state.commentsReducer.comments.filter((comm) => {
-      return comm.news === newsId;
-    })
-  );
-  console.log(comments);
+  const { newsId } = useParams();
+  const dispatch = useDispatch();
   const news = useSelector((state) =>
     state.newsReducer.news.find((news) => news._id === newsId)
   );
-  const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchNews());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  //вывод одной новости в новом окне при нажатии на нее'
+  }, [dispatch]);
 
   if (!news) {
-    return "loading...  ";
+    return "loading...";
   }
 
   return (
@@ -40,10 +29,10 @@ const News = () => {
         alt={news.title}
       />
       <div className="textNewsPage">{news.text}</div>
-      <div className="comments"></div>
       <Link to="/">
-        <button>назад к новостям</button>
+        <button className="NewsLeaveBtn">назад к новостям</button>
       </Link>
+      <Comments newsId={newsId} news={news} />
     </div>
   );
 };

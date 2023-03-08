@@ -1,7 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  error: null,
+  loginedUser: null,
+  users: [],
+  regMessage: null,
+  logMessage: null,
   signingUp: false,
   signingIn: false,
   token: localStorage.getItem("token"),
@@ -9,25 +12,36 @@ const initialState = {
 
 export const authSignUp = createAsyncThunk(
   "auth/signup",
-  async ({ login, password }, thunkAPI) => {
+  async ({ name, lastname, login, password }, thunkAPI) => {
     try {
       const res = await fetch("http://localhost:4000/auth/registration", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: login, password }),
+        body: JSON.stringify({ name, lastname, username: login, password }),
       });
       const json = await res.json();
-      if (json.error) {
-        return thunkAPI.rejectWithValue(json.error);
-      }
-      return json.message
+      return json.message;
     } catch (error) {
       thunkAPI.rejectWithValue(error);
     }
   }
 );
+
+function parseJwt(token) {
+  var base64Url = token.split(".")[1];
+  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  var jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+  return JSON.parse(jsonPayload);
+}
 
 export const authSignIn = createAsyncThunk(
   "auth/signin",
@@ -40,13 +54,39 @@ export const authSignIn = createAsyncThunk(
         },
         body: JSON.stringify({ username: login, password }),
       });
-      const token = await res.json();
-      if (token.error) {
-        return thunkAPI.rejectWithValue(token.error);
+      const json = await res.json();
+      if(json.message){
+        return thunkAPI.rejectWithValue(json);
       }
-      console.log(token);
-      localStorage.setItem("token", token);
-      return token;
+      if(json.token){
+        console.log('token');
+        localStorage.setItem('token', json.token)
+        return json
+      }
+    } catch (error) {
+      thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const authExit = createAsyncThunk(
+  "auth/exit",
+  async (data, thunkAPI) => {
+    try {
+      localStorage.removeItem('token');
+    } catch (error) {
+      thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const fetchUsers = createAsyncThunk(
+  "fetch/users",
+  async (data, thunkAPI) => {
+    try {
+      const res = await fetch("http://localhost:4000/auth/users");
+      const users = await res.json();
+      return users;
     } catch (error) {
       thunkAPI.rejectWithValue(error);
     }
@@ -58,28 +98,24 @@ const applicationSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(authSignUp.pending, (state) => {
-      state.signingUp = true;
-    });
-    builder.addCase(authSignUp.rejected, (state, action) => {
-      state.signingUp = false;
-      state.error = action.payload;
-    });
     builder.addCase(authSignUp.fulfilled, (state, action) => {
-      state.signingUp = false;
-      state.error = null;
-    });
-    builder.addCase(authSignIn.pending, (state) => {
-      state.signingUp = true;
+      state.regMessage = action.payload;
     });
     builder.addCase(authSignIn.rejected, (state, action) => {
-      state.signingUp = false;
-      state.error = action.payload;
+      state.logMessage = action.payload.message
     });
     builder.addCase(authSignIn.fulfilled, (state, action) => {
-      state.signingUp = false;
-      state.error = null;
-      state.token = action.payload;
+      state.logMessage = null;
+      state.token = action.payload.token;
+      state.loginedUser = parseJwt(state.token);
+    });
+    builder.addCase(fetchUsers.fulfilled, (state, action) => {
+      state.users = action.payload;
+      state.loginedUser = parseJwt(state.token);
+    });
+    builder.addCase(authExit.fulfilled, (state) => {
+      state.token = null;
+      state.loginedUser = null;
     });
   },
 });

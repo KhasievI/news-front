@@ -13,7 +13,7 @@ export const fetchCategories = createAsyncThunk(
       const categories = await res.json();
       return categories;
     } catch (error) {
-        console.log(error.message);
+      console.log(error.message);
     }
   }
 );
@@ -24,7 +24,7 @@ const categoriesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchCategories.fulfilled, (state, action) => {
-        state.categories = action.payload
+      state.categories = action.payload;
     });
   },
 });

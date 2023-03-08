@@ -2,7 +2,6 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Header from "./Header";
 import HomePage from "../pages/HomePage";
-import SideBar from "./SideBar";
 import News from "./News";
 
 function App() {
